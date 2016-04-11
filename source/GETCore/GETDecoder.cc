@@ -747,18 +747,9 @@ void GETDecoder::WriteFrame()
 }
 
 void GETDecoder::CheckEndOfData() {
-  if (!fIsMetaData && fFrameInfo -> GetEndByte() == fDataSize)
-    if (fIsOnline) {
-      ifstream dataTest(fDataList.at(fFrameInfo -> GetDataID()).Data(), std::ios::ate|std::ios::binary);
-      Long64_t testDataSize = dataTest.tellg();
-      dataTest.close();
-
-      if (fFrameInfo -> GetEndByte() < testDataSize) {
-        SetData(fFrameInfo -> GetDataID());
-        fData.seekg(fFrameInfo -> GetEndByte());
+  if (!fIsMetaData && fFrameInfo -> GetEndByte() == fDataSize) {
+    if (fIsOnline && IsUpdated())
         return;
-      }
-    }
 
     if (!NextData() && !fIsDoneAnalyzing) {
 
@@ -771,6 +762,7 @@ void GETDecoder::CheckEndOfData() {
 
       // Writing meta data will be here.
     }
+  }
 }
 
 void GETDecoder::BackupCurrentState() {
@@ -928,3 +920,18 @@ void GETDecoder::LoadMetaData(TString filename) {
 
 void GETDecoder::SetOnline(Bool_t value)  { fIsOnline = value; }
 void GETDecoder::SetEndLoop(Bool_t value) { fEndLoop = value; }
+
+Bool_t GETDecoder::IsUpdated() {
+  ifstream dataTest(fDataList.at(fFrameInfo -> GetDataID()).Data(), std::ios::ate|std::ios::binary);
+  Long64_t testDataSize = dataTest.tellg();
+  dataTest.close();
+
+  if (fFrameInfo -> GetEndByte() < testDataSize) {
+    SetData(fFrameInfo -> GetDataID());
+    fData.seekg(fFrameInfo -> GetEndByte());
+
+    return kTRUE;
+  }
+
+  return kFALSE;
+}

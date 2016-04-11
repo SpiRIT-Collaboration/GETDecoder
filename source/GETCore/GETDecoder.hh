@@ -113,8 +113,9 @@ class GETDecoder
     //! Set topology frame information manually
     void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
 
-    void SetOnline(Bool_t value = kTRUE);
-    void SetEndLoop(Bool_t value = kTRUE);
+      void SetOnline(Bool_t value = kTRUE);
+      void SetEndLoop(Bool_t value = kTRUE);
+    Bool_t IsUpdated();
 
   private:
     //! Initialize variables used in the class.
