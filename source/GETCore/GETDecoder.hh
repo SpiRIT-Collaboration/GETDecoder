@@ -113,6 +113,13 @@ class GETDecoder
     //! Set topology frame information manually
     void SetPseudoTopologyFrame(Int_t asadMask, Bool_t check = kFALSE);
 
+    void SetOnline(Bool_t value = kTRUE);
+    void SetEndLoop(Bool_t value = kTRUE);
+
+  private:
+    //! Initialize variables used in the class.
+    void Initialize();
+
           GETHeaderBase *fHeaderBase;
     GETBasicFrameHeader *fBasicFrameHeader;
          GETLayerHeader *fLayerHeader;
@@ -153,6 +160,9 @@ class GETDecoder
 
     Int_t fPrevDataID;        ///< Data ID for going back to original data
     ULong64_t fPrevPosition;  ///< Byte number for going back to original data
+
+    Bool_t fIsOnline;         ///< Online flag
+    Bool_t fEndLoop;          ///< Ending loop flag
 
   ClassDef(GETDecoder, 1); /// added for making dictionary by ROOT
 };
