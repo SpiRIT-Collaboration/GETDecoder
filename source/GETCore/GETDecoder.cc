@@ -120,7 +120,6 @@ void GETDecoder::Initialize()
   fPrevPosition = 0;
 
   fIsOnline = kFALSE;
-  fEndLoop = kFALSE;
 }
 
 void GETDecoder::Clear() {
@@ -202,25 +201,9 @@ Bool_t GETDecoder::SetData(Int_t index)
   }
 
   if (index >= fDataList.size()) {
-    if (!fIsOnline) {
-      std::cout << "== [GETDecoder] End of data list!" << std::endl;
+    std::cout << "== [GETDecoder] End of data list!" << std::endl;
 
-      return kFALSE;
-    } else {
-      while (kTRUE) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        if (fEndLoop)
-          return kFALSE;
-
-        TString nextFile = fDataList.back() + "." + fDataList.size();
-        if (GETFileChecker::CheckFile(nextFile, kFALSE)) {
-          fDataList.push_back(nextFile);
-
-          break;
-        }
-      }
-    }
+    return kFALSE;
   }
 
   if (fData.is_open())
@@ -919,7 +902,6 @@ void GETDecoder::LoadMetaData(TString filename) {
 }
 
 void GETDecoder::SetOnline(Bool_t value)  { fIsOnline = value; }
-void GETDecoder::SetEndLoop(Bool_t value) { fEndLoop = value; }
 
 Bool_t GETDecoder::IsUpdated() {
   ifstream dataTest(fDataList.at(fFrameInfo -> GetDataID()).Data(), std::ios::ate|std::ios::binary);
@@ -931,6 +913,14 @@ Bool_t GETDecoder::IsUpdated() {
     fData.seekg(fFrameInfo -> GetEndByte());
 
     return kTRUE;
+  } else {
+    TString nextFile = fDataList.back() + "." + fDataList.size();
+    if (GETFileChecker::CheckFile(nextFile, kFALSE)) {
+      fDataList.push_back(nextFile);
+
+      NextData();
+      return kTRUE;
+    }
   }
 
   return kFALSE;
